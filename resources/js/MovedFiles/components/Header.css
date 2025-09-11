@@ -1,0 +1,37 @@
+
+
+.Header {
+  padding: 0.5rem;        /* p-2 */
+  font-size: 0.875rem;    /* text-sm (14px) */
+  line-height: 1.25rem;   /* line-height for text-sm */
+  color: #374151;         /* text-gray-700 */
+  background-color: #e5e7eb; /* bg-gray-200 */
+  display: flex;          /* flex */
+  justify-content: space-between; /* justify-between */
+}
+
+
+.mode-toggle {
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.mode-toggle.light {
+  background-color: #ffffff;
+  color: #222;
+}
+
+.mode-toggle.dark {
+  background-color: #333;
+  color: #fff;
+}
+
+/* Active/pressed state */
+.mode-toggle:active {
+  transform: scale(0.95); /* Subtle press effect */
+}
+
+.mode-toggle:active .iconify {
+  color: #ffffff; /* Change icon color when pressed */
+}

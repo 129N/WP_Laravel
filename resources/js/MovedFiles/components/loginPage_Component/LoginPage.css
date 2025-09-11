@@ -1,0 +1,25 @@
+
+.mode-toggle {
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+  }
+  
+  .mode-toggle.light {
+    background-color: #ffffff;
+    color: #222;
+  }
+  
+  .mode-toggle.dark {
+    background-color: #333;
+    color: #fff;
+  }
+  
+  /* Active/pressed state */
+  .mode-toggle:active {
+    transform: scale(0.95); /* Subtle press effect */
+  }
+  
+  .mode-toggle:active .iconify {
+    color: #ffffff; /* Change icon color when pressed */
+  }

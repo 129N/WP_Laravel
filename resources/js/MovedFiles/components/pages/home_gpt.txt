@@ -1,0 +1,94 @@
+import React, { useState } from "react";
+
+// Define types for the props
+interface NavigationBarProps {
+  role: "admin" | "audience" | "participant" | null;
+}
+
+interface StatusIndicatorProps {
+  status: string;
+  battery: number;
+}
+
+interface LoginPageProps {
+  onLogin: (role: "admin" | "audience" | "participant") => void;
+}
+
+interface ThemeToggleProps {
+  darkMode: boolean;
+  setDarkMode: (darkMode: boolean) => void;
+}
+
+const NavigatoinBar = ({ role }: NavigationBarProps) => {
+  return (
+    <nav className="p-4 bg-blue-600 text-white flex justify-between">
+      <h1 className="text-xl font-bold">Route Tracker</h1>
+      <div>
+        {role === "admin" && <button className="mr-4">Admin Panel</button>}
+        {role === "audience" && <button className="mr-4">Live Map</button>}
+        {role === "participant" && <button className="mr-4">Participant Waypoint View</button>}
+      </div>
+    </nav>
+  );
+};
+
+const StatusIndicator = ({ status, battery }: StatusIndicatorProps) => {
+  return (
+    <div className="p-2 text-sm text-gray-700 bg-gray-200 flex justify-between">
+      <span>Status: {status}</span>
+      <span>Battery: {battery}%</span>
+    </div>
+  );
+};
+
+const LoginPage = ({ onLogin }: LoginPageProps) => {
+  return (
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+      <h2 className="text-2xl font-bold mb-6">Login as</h2>
+      <button className="p-2 bg-blue-500 text-white m-2" onClick={() => onLogin("participant")}>
+        Participant
+      </button>
+      <button className="p-2 bg-green-500 text-white m-2" onClick={() => onLogin("admin")}>
+        Event Holder (Admin)
+      </button>
+      <button className="p-2 bg-purple-500 text-white m-2" onClick={() => onLogin("audience")}>
+        Audience
+      </button>
+    </div>
+  );
+};
+
+const ThemeToggle = ({ darkMode, setDarkMode }: ThemeToggleProps) => {
+  return (
+    <button
+      className="p-2 bg-gray-800 text-white"
+      onClick={() => setDarkMode(!darkMode)}
+    >
+      {darkMode ? "Light Mode" : "Dark Mode"}
+    </button>
+  );
+};
+
+const Home = () => {
+  const [role, setRole] = useState<"admin" | "audience" | "participant" | null>(null);
+  const [darkMode, setDarkMode] = useState(false);
+
+  if (!role) {
+    return (
+      <div>
+        <ThemeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
+        <StatusIndicator status="Online" battery={85} />
+        <LoginPage onLogin={setRole} />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <NavigatoinBar role={role} />
+      <StatusIndicator status="Online" battery={85} />
+    </div>
+  );
+};
+
+export default Home;
