@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
     <head>
         <meta charset="utf-8">
@@ -42,5 +42,29 @@
     </head>
     <body class="font-sans antialiased">
         @inertia
+
+        bbjkbkbb
     </body>
+</html> -->
+<!doctype html>
+<html lang="{{ str_replace('_','-', app()->getLocale()) }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ config('app.name','Laravel API') }}</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 2rem; }
+    code { background: #f5f5f5; padding: .2rem .4rem; border-radius: 4px; }
+    a { text-decoration: none; }
+  </style>
+</head>
+<body>
+  <h1>Waypoint Tracker API</h1>
+  <p>Server is running.</p>
+  <ul>
+    <li><a href="{{ url('/api/ping') }}">/api/ping</a></li>
+    <li><a href="{{ url('/api/status') }}">/api/status</a></li>
+    <li><a href="{{ url('/api/status') }}">/api/status</a></li>
+  </ul>
+</body>
 </html>
