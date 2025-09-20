@@ -11,6 +11,9 @@ use App\Models\User_react;
 
 use Illuminate\Support\Facades\Validator;
 
+
+
+
 class AuthController extends Controller
 {
     //
@@ -104,7 +107,6 @@ class AuthController extends Controller
                     ],
                     'token' => $token
                 ], 200);
-
 
     }
 

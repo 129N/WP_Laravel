@@ -8,8 +8,9 @@ use App\Http\Controllers\GpxController;
 use App\Http\Controllers\WPReactController;
 
 
-//http://192.168.0.101:8000/ is used for Waypiin tracker 
+//http://192.168.0.101:8000/ is used for Waypoint tracker 
 
+// export const BASE_URL = 'https://49e00eec2c67.ngrok-free.app/api'; stable connection 
 
 // Health checks (public)
 Route::get('/ping', fn () => response()->json(['message' => 'Laravel OK Itsuku Nakano'])); // single ping
@@ -27,7 +28,10 @@ Route::post('/login_react', [AuthController::class, 'login_react']);
 Route::post('/login', [AuthController::class, 'login']);
 //Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
+  Route::get('/registered_users', [AuthController::class, 'getUsers']);
 
+    // Dangerous endpoint: keep admin-only or remove.
+Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
 
 // Everything else requires Sanctum
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -57,12 +61,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notify', [NotificationCtrl::class, 'store']);
     Route::get('/notifications', [NotificationCtrl::class, 'index']);         // fix class name case
 
-    // Admin-only
+    // Admin-only or now is ok 
     Route::middleware('role:admin')->group(function () {
-        Route::get('/registered_users', [AuthController::class, 'getUsers']);
-
-        // Dangerous endpoint: keep admin-only or remove.
-        Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
+        // Route::get('/registered_users', [AuthController::class, 'getUsers']);
+       // Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
         // Alternatively keep your original path but change it to DELETE:
         // Route::delete('/delete_user', [AuthController::class, 'deleteUsers']);
     });

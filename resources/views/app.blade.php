@@ -64,7 +64,11 @@
   <ul>
     <li><a href="{{ url('/api/ping') }}">/api/ping</a></li>
     <li><a href="{{ url('/api/status') }}">/api/status</a></li>
-    <li><a href="{{ url('/api/status') }}">/api/status</a></li>
+    <li><a href="{{ url('/api/registered_users') }}">/api/registered_users</a></li>
+    <li><a href="{{ url('/api/user') }}">/api/user</a></li>
+      <li><a href="{{ url('/api/waypoints') }}">/api/waypoints</a></li>
+    
+                    
   </ul>
 </body>
 </html>
