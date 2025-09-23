@@ -11,12 +11,11 @@ use Illuminate\Support\Facades\Validator;
 
 // API token 
 use Laravel\Sanctum\HasApiTokens;
-class User_react extends Model
+class User_react extends Authenticatable
 {
-    //
-    protected $fillable = ['email', 'password', 'role'];
-
     use HasApiTokens, Notifiable;
+    
+    protected $fillable = ['email', 'password', 'role'];
 
     protected $hidden =[
         'password',

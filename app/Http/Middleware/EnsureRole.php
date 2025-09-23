@@ -1,11 +1,11 @@
-// app/Http/Middleware/EnsureRole.php
-
 <?php
 
+namespace App\Http\Middleware;
 
 
 use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class EnsureRole 
 {
@@ -17,3 +17,5 @@ class EnsureRole
         return $next($request);
     }
 }
+
+
