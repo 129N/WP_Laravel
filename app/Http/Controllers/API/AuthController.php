@@ -129,16 +129,14 @@ class AuthController extends Controller
         ]);
     }
 
-
-
-
-// AuthController.php
-
-
-
+    //Logout from its
     public function logout(Request $request)
     {
-        $request-> user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'Logged out']);
+        if ($request->user() && $request->user()->currentAccessToken()) {
+            $request-> user()->currentAccessToken()->delete();
+            return response()->json(['message' => 'Logged out successfuly']);
+        }
+        
+       return response()->json(['message' => 'No active token found']);
     }
 }

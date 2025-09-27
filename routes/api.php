@@ -24,9 +24,12 @@ Route::get('/status', fn () => response()->json(['status' => 'ok']));
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login_react', [AuthController::class, 'login_react']);
 
+
+Route::post('/logout', [AuthController::class, 'logout']);
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+
 // routes/api.php
 Route::post('/login', [AuthController::class, 'login']);
-//Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
   //Route::get('/registered_users', [AuthController::class, 'getUsers']);
 

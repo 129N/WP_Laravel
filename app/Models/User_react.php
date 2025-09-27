@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+
 
 
 // API token 
@@ -18,8 +16,8 @@ class User_react extends Authenticatable
     protected $fillable = ['email', 'password', 'role'];
 
     protected $hidden =[
-        'password',
-        'remeber_token',
+        // 'password',
+        'remember_token',
     ];
 
 }
