@@ -6,7 +6,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\NotificationCtrl;
 use App\Http\Controllers\GpxController;
 use App\Http\Controllers\WPReactController;
-
+use App\Http\Controllers\EventController;
 
 //http://192.168.0.101:8000/ is used for Waypoint tracker 
 
@@ -29,14 +29,12 @@ Route::post('/logout', [AuthController::class, 'logout']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
 // routes/api.php
-Route::post('/login', [AuthController::class, 'login']);
+//Route::post('/login', [AuthController::class, 'login']);
 
   //Route::get('/registered_users', [AuthController::class, 'getUsers']);
 
     // Dangerous endpoint: keep admin-only or remove.
 Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
-
-
 
 
 // Legacy GPX endpoints (keep if used by RN)
@@ -48,13 +46,22 @@ Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
     Route::post('/gpx-upload', [WPReactController::class, 'store']);          // RN upload (if used)
     Route::post('/delete', [WPReactController::class, 'delete']);             // consider making this DELETE + admin
 
-//http://192.168.0.101:8000/api/GPX-UPLOADED 
+/**
+ * Event Creation Controller
+ * 
+ */
+
+Route::get('/events', [EventController::class, 'index']); // list events
+Route::post('/events', [EventController::class, 'store']); // create event (admin)
+Route::post('/events/{id}/register', [EventController::class, 'registerParticipant']); // register participant
+
+
+
 // Everything else requires Sanctum
 Route::middleware('auth:sanctum')->group(function () {
 
     // Current user
     Route::get('/user', fn (Request $request) => $request->user());
-    //Route::post('/logout', [AuthController::class, 'logout']);
 
     
     // Notifications
@@ -82,34 +89,4 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
-//Delete zone
-
-// In routes/api.php
-// Route::middleware('auth:api')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-//Route::get('/registered_users', [AuthController::class, 'getUsers']);
-
-// Route::post('/GPX-UPLOADED', [GpxController::class, 'uploadGPX']);
-// Route::get('/GPX-GOT', [GpxController::class, 'extract']);
-
-
-// //truncate method
-// Route::post('/delete_user', [AuthController::class, 'deleteUsers']);
-
-
-// // WP_react Controller POST
-// Route::post('/gpx-upload', [WPReactController::class, 'store']);
-// Route::get('/waypoints', [WPReactController::class, 'index']);
-// Route::post('/delete', [WPReactController::class, 'delete']);
-
-
-// Route::post('/notify', [NotificationCtrl::class, 'store']);
-// Route::get('/notifications', [NotificationCTRL::class, 'index']);  // For admin
-   
-
-//waypoint controller api 
-//Route::post('/upload-gpx', [WaypointController::class, 'upload']);
-//Route::get('/waypoints', [WaypointController::class, 'index']);
 

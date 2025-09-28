@@ -16,28 +16,28 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    //
-    public function login(Request $request)
-    {
-        $request -> validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+    // Default login not for Login react native
+    // public function login(Request $request)
+    // {
+    //     $request -> validate([
+    //         'email' => 'required|string|email',
+    //         'password' => 'required|string',
+    //     ]);
 
 
-        if(!Auth:: attempt($request->only('email', 'password'))) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
-        }
+    //     if(!Auth:: attempt($request->only('email', 'password'))) {
+    //         return response()->json(['message' => 'Invalid credentials'], 401);
+    //     }
 
-        $user = User::where('email', $request->email)->first();
-        $token = $user->createToken('mobileToken')->plainTextToken;
+    //     $user = User::where('email', $request->email)->first();
+    //     $token = $user->createToken('mobileToken')->plainTextToken;
      
         
-        return response()->json([
-            'token' => $token,
-            'user' => $user,
-        ]);
-    }
+    //     return response()->json([
+    //         'token' => $token,
+    //         'user' => $user,
+    //     ]);
+    // }
 
 
     public function register(Request $request){
@@ -136,7 +136,7 @@ class AuthController extends Controller
             $request-> user()->currentAccessToken()->delete();
             return response()->json(['message' => 'Logged out successfuly']);
         }
-        
+
        return response()->json(['message' => 'No active token found']);
     }
 }
