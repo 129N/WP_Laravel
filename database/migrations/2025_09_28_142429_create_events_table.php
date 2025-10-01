@@ -12,13 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('events', function (Blueprint $table) {
-            $table->id(); //auto generate
+            $table->id(); //auto generate primary key
+            $table->string('event_code')->unique(); // EV01, EV02... to show user.
             $table->string('event_title');
             $table->text('description');
             $table->dateTime('event_date');
-            $table->unsignedBigInteger('created_by'); // admin_user_id
+            $table->unsignedBigInteger('created_by'); // foreign key referencing an admin’s ID.
+            // $table->string('event_creatorName'); 
             $table->timestamps();
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+
+            $table->foreign('created_by')->references('id')->on('User_react')->onDelete('cascade');
         });
     }
 

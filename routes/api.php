@@ -51,9 +51,12 @@ Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
  * 
  */
 
-Route::get('/events', [EventController::class, 'index']); // list events
-Route::post('/events', [EventController::class, 'store']); // create event (admin)
-Route::post('/events/{id}/register', [EventController::class, 'registerParticipant']); // register participant
+
+Route::middleware('auth:sanctum')->group(function (){
+    Route::get('/events', [EventController::class, 'index']); // list events
+    Route::post('/events', [EventController::class, 'store']); // create event (admin)
+    Route::post('/events/{id}/register', [EventController::class, 'registerParticipant']); // register participant
+});
 
 
 

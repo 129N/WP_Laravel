@@ -23,19 +23,32 @@ class EventController extends Controller
     // Creates a new event
         public function store(Request $request)
     {
+        $lastEvent = Event::latest()->first();
+        $nextNumber = $lastEvent ? intval(substr($lastEvent->event_code, 2)) + 1 : 1;
+        $eventCode = 'EV' . str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
+
         // stores each property
 
         // validate input
     $validated = $request->validate([
-        'EventTitle'       => 'required|string|max:255',
+        'event_title'      => 'required|string|max:255',
         'description'      => 'required|string',
         'event_date'       => 'required|date',
-        'created_by'       => 'required|integer', // admin ID
-        'event_creatorName'=> 'required|string|max:255',
+        // 'event_creatorName'=> 'required|string|max:255', //admin's name
     ]);
 
+    // inject our generated code
+    // $validated['created_by'] = $request->user()->id;// auto generated
+    // $validated['event_code'] = $eventCode;
+
     // Create event 
-    $event = Event::create($validated);
+    $event = Event::create([
+        'event_code'   => $eventCode,
+        'event_title'  => $validated['event_title'],
+        'description'  => $validated['description'],
+        'event_date'   => $validated['event_date'],
+        'created_by'   => $request->user()->id, // ✅ from token
+    ]);
 
     return response()->json([
         'message' => 'Event created successfully',

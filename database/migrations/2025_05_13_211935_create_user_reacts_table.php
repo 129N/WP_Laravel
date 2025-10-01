@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_reacts', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // depending on the role, it can sort.
+            $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
             $table->string('role')->default('competitor'); 

@@ -13,7 +13,7 @@ class User_react extends Authenticatable
 {
     use HasApiTokens, Notifiable;
     
-    protected $fillable = ['email', 'password', 'role'];
+    protected $fillable = ['name', 'email', 'password', 'role'];
 
     protected $hidden =[
         // 'password',

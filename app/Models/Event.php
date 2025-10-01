@@ -12,11 +12,12 @@ class Event extends Model
     use HasFactory;
 
     protected $fillable = [
-        'EventTitle',
+        'event_code',
+        'event_title',
         'description',
         'event_date',
         'created_by',
-        'event_creatorName'
+        // 'event_creatorName',
     ];
 
     public function registrations() {

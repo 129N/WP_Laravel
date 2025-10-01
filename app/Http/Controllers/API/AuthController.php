@@ -47,10 +47,12 @@ class AuthController extends Controller
         $request -> validate([
             'email' => 'required|string|email|unique:users,email',
             'password' => 'required|string',
-            'role' => 'required|in:admin,competitor'
+            'role' => 'required|in:admin,competitor',
+            'name' => 'required|string',
         ]);
 
          $user = User_react::create([
+        'name' => $request->name,   
         'email' => $request->email,
         'password' => Hash::make($request->password),
         'role' => $request->role
@@ -62,13 +64,14 @@ class AuthController extends Controller
         'user' => [
             'id' => $user->id,
             'email' => $user->email,
-            'role' => $user->role
+            'role' => $user->role,
+            'name' => $user->name,
         ]], 201);
     }
     
     catch(\Exception $e){ 
 
-         return response()->json(['error' => 'Registration failed (success!!) ', 
+         return response()->json(['error' => 'Registration failed ', 
          'details' => $e->getMessage()], 500);
     }
 
@@ -103,7 +106,8 @@ class AuthController extends Controller
                     'user' => [
                         'id' => $user->id,
                         'email' => $user->email,
-                        'role' => $user->role
+                        'role' => $user->role, 
+                        'name'=> $user-> name,
                     ],
                     'token' => $token
                 ], 200);
