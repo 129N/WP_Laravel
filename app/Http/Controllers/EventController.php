@@ -30,30 +30,30 @@ class EventController extends Controller
         // stores each property
 
         // validate input
-    $validated = $request->validate([
-        'event_title'      => 'required|string|max:255',
-        'description'      => 'required|string',
-        'event_date'       => 'required|date',
-        // 'event_creatorName'=> 'required|string|max:255', //admin's name
-    ]);
+        $validated = $request->validate([
+            'event_title'      => 'required|string|max:255',
+            'description'      => 'required|string',
+            'event_date'       => 'required|date',
+            // 'event_creatorName'=> 'required|string|max:255', //admin's name
+        ]);
 
-    // inject our generated code
-    // $validated['created_by'] = $request->user()->id;// auto generated
-    // $validated['event_code'] = $eventCode;
+        // inject our generated code
+        // $validated['created_by'] = $request->user()->id;// auto generated
+        // $validated['event_code'] = $eventCode;
 
-    // Create event 
-    $event = Event::create([
-        'event_code'   => $eventCode,
-        'event_title'  => $validated['event_title'],
-        'description'  => $validated['description'],
-        'event_date'   => $validated['event_date'],
-        'created_by'   => $request->user()->id, // ✅ from token
-    ]);
+        // Create event 
+        $event = Event::create([
+            'event_code'   => $eventCode,
+            'event_title'  => $validated['event_title'],
+            'description'  => $validated['description'],
+            'event_date'   => $validated['event_date'],
+            'created_by'   => $request->user()->id, // ✅ from token
+        ]);
 
-    return response()->json([
-        'message' => 'Event created successfully',
-        'event'   => $event,
-    ], 201);
+        return response()->json([
+            'message' => 'Event created successfully',
+            'event'   => $event,
+        ], 201);
         
     }
 
@@ -81,5 +81,23 @@ class EventController extends Controller
             'message' => 'Participant registered successfully',
             'registration' => $registration,
         ], 201);
+    }
+
+
+    public function destroy($id, Request $request){
+        $event = Event::find($id);
+
+        if(!$event){
+            return response()-> json(['error' => 'Event not found'], 404);
+        }
+
+        if ($event->created_by !== $request->user()->id) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+
+        $event->delete();
+
+        return response()-> json(['message' => 'Event deleted successfully'], 200);
     }
 }

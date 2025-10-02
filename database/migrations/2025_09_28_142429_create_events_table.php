@@ -21,7 +21,7 @@ return new class extends Migration
             // $table->string('event_creatorName'); 
             $table->timestamps();
 
-            $table->foreign('created_by')->references('id')->on('User_react')->onDelete('cascade');
+            $table->foreign('created_by')->references('id')->on('user_reacts')->onDelete('cascade');
         });
     }
 
