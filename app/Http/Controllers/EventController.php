@@ -14,7 +14,22 @@ class EventController extends Controller
     {
         // list events
 
-        $events = Event::withCount('registrations')->get();
+        $events = Event::with(['creator:id,name,email'])
+        ->withCount('registrations')->get();
+
+        //for clean json structure 
+        $events = $events->map(function ($event){
+            return [
+                'id' => $event->id,
+                'event_code' => $event->event_code,
+                'event_title' => $event->event_title,
+                'description' => $event->description,
+                'event_date' => $event->event_date,
+                'creator_name' => $event->creator->name ?? 'Unknown',
+                'creator_email' => $event->creator->email ?? null,
+                'registration_count' => $event->registrations_count,
+            ];
+        });
 
         return response()->json($events, 200);
     }

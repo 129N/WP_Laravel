@@ -7,6 +7,7 @@ use App\Http\Controllers\NotificationCtrl;
 use App\Http\Controllers\GpxController;
 use App\Http\Controllers\WPReactController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\TeamController;
 
 //http://192.168.0.101:8000/ is used for Waypoint tracker 
 
@@ -51,12 +52,24 @@ Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
  * 
  */
 
-
 Route::middleware('auth:sanctum')->group(function (){
     Route::get('/events', [EventController::class, 'index']); // list events
     Route::post('/events', [EventController::class, 'store']); // create event (admin)
     Route::post('/events/{id}/register', [EventController::class, 'registerParticipant']); // register participant
     Route::delete('/events/{id}', [EventController::class, 'destroy']);
+});
+
+
+
+Route::middleware('auth:sanctum')->group(function() {
+    //Participant creates a team 
+    Route::post('/teams', [TeamController::class, 'createTeam']);
+
+    // Get all teams for a given event (for admin)
+    Route::get('/teams/event/{event_id}', [TeamController::class, 'getTeamsByEvent']);
+    
+    // Delete team (admin only)
+    Route::delete('/teams/{id}', [TeamController::class, 'deleteTeam']);
 });
 
 
