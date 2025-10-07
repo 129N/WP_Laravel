@@ -42,6 +42,8 @@ class EventController extends Controller
         $nextNumber = $lastEvent ? intval(substr($lastEvent->event_code, 2)) + 1 : 1;
         $eventCode = 'EV' . str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
 
+
+        $user = $request->user();
         // stores each property
 
         // validate input
@@ -62,7 +64,7 @@ class EventController extends Controller
             'event_title'  => $validated['event_title'],
             'description'  => $validated['description'],
             'event_date'   => $validated['event_date'],
-            'created_by'   => $request->user()->id, // ✅ from token
+            'created_by'   =>  $user->id, // ✅ from token
         ]);
 
         return response()->json([
