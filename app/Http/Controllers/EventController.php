@@ -74,21 +74,38 @@ class EventController extends Controller
         
     }
 
-    // register a participant to an event
+    // register a single participant to an event
         public function registerParticipant(Request $request, $id)
     {
          // Validate input
         $validated = $request->validate([
             'user_id'    => 'required|integer', // participant user_id
-            'group_name' => 'nullable|string|max:255',
+            'group_name' => 'nullable|string|max:255', //solo is OK
         ]);
 
         // Make sure event exists
         $event = Event::findOrFail($id);
 
+        //Get user ID 
+        $userId = $validated['user_id'] ?? optional($request->user())->id;
+
+        if(!$userId){
+            return response()->json(['error' => 'User not authenticated or user_id missing'], 401);
+        }
+
+
+        //Check for duplicate registration 
+        $regsiteredCheck = EventRegistration::where('event_id', $event->id)
+        ->where('user_id', $userId)->exists();
+
+        if ($regsiteredCheck) {
+        return response()->json(['error' => 'User already registered for this event'], 409);
+        }
+
+        //create registration 
         $registration = EventRegistration::create([
             'event_id'   => $event->id,
-            'user_id'    => $validated['user_id'],
+            'user_id'    => $userId,
             'group_name' => $validated['group_name'] ?? null,
             'status'     => 'registered',
 
@@ -101,6 +118,21 @@ class EventController extends Controller
     }
 
 
+    //single user delete of registration
+    public function deleteParticipants($id){
+
+        $registration = EventRegistration::find($id);
+
+        if(!$registration){
+            return response()->json(['error' => 'Participant not found'], 404);
+        }
+        $registration -> delete();
+        return response()-> json(['message' => 'Participant deleted successfully'], 200);
+    }
+
+
+
+    //Only deleting its event, not the registred user.
     public function destroy($id, Request $request){
         $event = Event::find($id);
 

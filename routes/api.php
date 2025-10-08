@@ -8,6 +8,7 @@ use App\Http\Controllers\GpxController;
 use App\Http\Controllers\WPReactController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\TeamController;
+use App\Models\EventRegistration;
 
 //http://192.168.0.101:8000/ is used for Waypoint tracker 
 
@@ -20,6 +21,11 @@ Route::get('/status', fn () => response()->json(['status' => 'ok']));
 
 //Route::get('/ping', [App\Http\Controllers\ApiController::class, 'ping']);
 
+
+/**
+ * Authentication
+ * 
+ */
 //Auth (public)
 //Registration & login handling
 Route::post('/register', [AuthController::class, 'register']);
@@ -29,7 +35,7 @@ Route::post('/login_react', [AuthController::class, 'login_react']);
 Route::post('/logout', [AuthController::class, 'logout']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
-// routes/api.php
+
 //Route::post('/login', [AuthController::class, 'login']);
 
   //Route::get('/registered_users', [AuthController::class, 'getUsers']);
@@ -38,6 +44,11 @@ Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logo
 Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
 
 
+
+/**
+ * GPX tracking system
+ * 
+ */
 // Legacy GPX endpoints (keep if used by RN)
     Route::post('/GPX-UPLOADED', [GpxController::class, 'uploadGPX']);
     Route::get('/GPX-GOT', [GpxController::class, 'extract']);
@@ -48,18 +59,30 @@ Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
     Route::post('/delete', [WPReactController::class, 'delete']);             // consider making this DELETE + admin
 
 /**
- * Event Creation Controller
+ * Event Register Controller
  * 
  */
 
-Route::middleware('auth:sanctum')->group(function (){
+    //public routes
     Route::get('/events', [EventController::class, 'index']); // list events
+
+     //Single registration 
+Route::middleware('auth:sanctum')->group(function (){
+    // Route::get('/events', [EventController::class, 'index']); // list events
     Route::post('/events', [EventController::class, 'store']); // create event (admin)
     Route::post('/events/{id}/register', [EventController::class, 'registerParticipant']); // register participant
     Route::delete('/events/{id}', [EventController::class, 'destroy']);
 });
 
 
+
+/**
+ * Multiple registration  
+ * 
+ */
+
+// Route::post('/event_registrations', [EventController::class, 'event']);
+// Route::get('/event_registrations', [EventController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function() {
     //Participant creates a team 

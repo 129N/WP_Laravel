@@ -21,7 +21,7 @@ return new class extends Migration
 
             $table->unique(['event_id', 'user_id']); // it prvents duplicates automatically.
             $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('user_reacts')->onDelete('cascade');
         });
     }
 
