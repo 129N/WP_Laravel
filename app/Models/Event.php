@@ -28,4 +28,9 @@ class Event extends Model
     public function creator(){
         return $this->belongsTo(User_react::class, 'created_by', 'id');
     }
+
+
+    public function teamRegistrations() {
+        return $this->hasMany(TeamRegistration::class, 'event_id');
+    }
 }

@@ -87,6 +87,7 @@ class EventController extends Controller
         $event = Event::findOrFail($id);
 
         //Get user ID 
+        $user = $request->user();
         $userId = $validated['user_id'] ?? optional($request->user())->id;
 
         if(!$userId){
@@ -108,7 +109,8 @@ class EventController extends Controller
             'user_id'    => $userId,
             'group_name' => $validated['group_name'] ?? null,
             'status'     => 'registered',
-
+            'participant_name'  => $user->name, 
+            'email'             => $user->email,
         ]);
         
         return response()->json([

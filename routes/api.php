@@ -9,6 +9,8 @@ use App\Http\Controllers\WPReactController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\TeamController;
 use App\Models\EventRegistration;
+use App\Http\Controllers\AdminController;
+
 
 //http://192.168.0.101:8000/ is used for Waypoint tracker 
 
@@ -18,8 +20,6 @@ use App\Models\EventRegistration;
 Route::get('/ping', fn () => response()->json(['message' => 'Laravel OK Itsuku Nakano'])); // single ping
 Route::get('/status', fn () => response()->json(['status' => 'ok']));
 
-
-//Route::get('/ping', [App\Http\Controllers\ApiController::class, 'ping']);
 
 
 /**
@@ -71,7 +71,7 @@ Route::middleware('auth:sanctum')->group(function (){
     // Route::get('/events', [EventController::class, 'index']); // list events
     Route::post('/events', [EventController::class, 'store']); // create event (admin)
     Route::post('/events/{id}/register', [EventController::class, 'registerParticipant']); // register participant
-    Route::delete('/events/{id}', [EventController::class, 'destroy']);
+    Route::delete('/registrations/{id}', [EventController::class, 'destroy']);
 });
 
 
@@ -89,11 +89,23 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::post('/teams', [TeamController::class, 'createTeam']);
 
     // Get all teams for a given event (for admin)
-    Route::get('/teams/event/{event_id}', [TeamController::class, 'getTeamsByEvent']);
+    Route::get('/teams/event/{id}/register', [TeamController::class, 'getTeamsByEvent']);
     
     // Delete team (admin only)
-    Route::delete('/teams/{id}', [TeamController::class, 'deleteTeam']);
+    Route::delete('/teams/{id}/delete', [TeamController::class, 'deleteTeam']);
 });
+
+
+/**
+ * Event Register Controller
+ * 
+ */
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/admin/overview', [AdminController::class, 'getFullOverview']);
+});
+
+
+
 
 
 

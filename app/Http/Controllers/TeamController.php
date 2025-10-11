@@ -19,6 +19,8 @@ class TeamController extends Controller
             'event_id' => 'required|exists:events,id',
             'team_name' => 'required|string|max:255',
             'members' => 'nullable|array', // optional array of members
+            'members.*.member_name' => 'required|string',
+            'members.*.member_email' => 'required|email',
         ]);
 
 
@@ -31,7 +33,6 @@ class TeamController extends Controller
         if(!$user){
             return response()-> json(['error' => 'Unauthorized'], 401);
         }
-
         //Create Team
         //     protected $fillable = ['team_code','event_id', 'leader_id', 'team_name', 'status'];
 
@@ -83,7 +84,4 @@ class TeamController extends Controller
 
             return response()->json(['message' => 'Team deleted successfully']);
         }
-
-
-
 }
