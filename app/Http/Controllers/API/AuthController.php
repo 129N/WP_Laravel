@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\User_react;
 
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -78,6 +79,8 @@ class AuthController extends Controller
     }
 
     public function login_react(Request $request){
+        Log::info('Login request data:', $request->all());
+
            // Validate incoming request
             $validator = Validator::make($request->all(), [
                 'email' => 'required|string|email',
@@ -136,6 +139,8 @@ class AuthController extends Controller
     //Logout from its
     public function logout(Request $request)
     {
+                Log::info('Log data:', $request->all());
+
         if ($request->user() && $request->user()->currentAccessToken()) {
             $request-> user()->currentAccessToken()->delete();
             return response()->json(['message' => 'Logged out successfuly']);
