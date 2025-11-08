@@ -21,7 +21,6 @@ Route::get('/ping', fn () => response()->json(['message' => 'Laravel OK Itsuku N
 Route::get('/status', fn () => response()->json(['status' => 'ok']));
 
 
-
 /**
  * Authentication
  * 
@@ -54,7 +53,7 @@ Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
     Route::get('/GPX-GOT', [GpxController::class, 'extract']);
     
     // Waypoints / GPX
-    Route::get('/waypoints', [WPReactController::class, 'index']);            // read
+    Route::get('/filefetch', [WPReactController::class, 'index']);            // read
     Route::post('/gpx-upload', [WPReactController::class, 'store']);          // RN upload (if used)
     Route::post('/delete', [WPReactController::class, 'delete']);             // consider making this DELETE + admin
 
@@ -106,16 +105,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-
-
-
 // Everything else requires Sanctum
 Route::middleware('auth:sanctum')->group(function () {
 
     // Current user
     Route::get('/user', fn (Request $request) => $request->user());
 
-    
     // Notifications
     Route::post('/notify', [NotificationCtrl::class, 'store']);
     Route::get('/notifications', [NotificationCtrl::class, 'index']);         // fix class name case
@@ -127,7 +122,6 @@ Route::middleware('auth:sanctum')->group(function () {
         // Alternatively keep your original path but change it to DELETE:
          Route::delete('/delete_user', [AuthController::class, 'deleteUsers']);
     });
-
 
      // Participant or admin can see their own profile, etc. 
      // DO IT LATER 

@@ -17,8 +17,10 @@ class WPReactController extends Controller
     {
          set_time_limit(300);
          $waypoints = WP_react::where('type', 'wpt')->get();
+         $trackpoints = WP_react::where ('type', 'trkpt')->get();
          return response()->json([
-        'waypoints' => $waypoints
+        'waypoints' => $waypoints,
+        'trackpoints' => $trackpoints,
     ]);
 
     }
