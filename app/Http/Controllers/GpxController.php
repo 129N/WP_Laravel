@@ -8,10 +8,11 @@ use App\Models\Waypoint;
 use App\Models\TrackPoint;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use App\Models\WP_react;
 //       Log::info('Gpx Processor hit');
 class GpxController extends Controller
 {
-    
+    // it may not need.
     public function uploadGPX(Request $request){
 
       Log::info('Gpx Processor hit');
@@ -67,37 +68,90 @@ class GpxController extends Controller
       
             ], 400);
         }
-
-
      
-    //     $trackPoints =  $xml->trk->trkseg->trkpt ?? [];
-    //     // Save track points
-    //    if (is_array($trackPoints) && count($trackPoints) > 0) {
-    //     foreach ($trackPoints as $pt) {
-    //         TrackPoint::create([
-    //             'latitude' => (float) $pt['lat'],
-    //             'longitude' => (float) $pt['lon'],
-    //         ]);
-    //     }
-    // } else {
-    //     Log::warning('No track points found in the GPX file');
-    // }
-    //     return response()->json([
-    //          'success' => false,
-    //         'message' => 'trackPoints: Invalid file or no file uploaded.'
-    //     ], 400);
+
     }
 
-    public function extract()
+    public function download()
     {
-        $waypoints = Waypoint::all();
-        //$trackPoints = TrackPoint::all();
-        return response()->json([
+            set_time_limit(300);
+            $waypoints = WP_react::where('type', 'wpt')->get();
+            $trackpoints = WP_react::where ('type', 'trkpt')->get();
+            return response()->json([
             'waypoints' => $waypoints,
-            //'trackPoints' => $trackPoints,
+            'trackpoints' => $trackpoints,
         ]);
+
+    }
+
+    public function delete()
+    {
+        //
+        WP_react::truncate();
+        return response()->json(['message' => 'The gpx file delete OK']);
+    }
+
+    public function store(Request $request)
+    {
+        set_time_limit(300);
+
+         if (!$request->hasFile('gpx_file')) {
+            return response()->json(['error' => 'No GPX file uploaded.'], 400);
+        }
+
+          $file = $request->file('gpx_file');
+        $gpxContent = file_get_contents($file->getRealPath());
+
+        $gpxContent = str_replace('xmlns=', 'ns=', $gpxContent);
+        $xml = simplexml_load_string($gpxContent);
+
+         if (!$xml) return response()->json(['error' => 'Invalid XML'], 400);
+
+          // Parse Waypoints
+        foreach ($xml->wpt as $wpt) {
+            WP_react::create([
+                'type' => 'wpt',
+                'lat' => (float)$wpt['lat'],
+                'lon' => (float)$wpt['lon'],
+                'name' => (string)$wpt->name ?? null,
+                'desc' => (string)$wpt->desc ?? null,
+                'ele' => null,
+            ]);
+        }
+
+          // Parse Trackpoints
+          foreach ($xml->trk->trkseg->trkpt as $trkpt) {
+            WP_react::create([
+                'type' => 'trkpt',
+                'lat' => (float)$trkpt['lat'],
+                'lon' => (float)$trkpt['lon'],
+                'name' => null,
+                'desc' => null,
+                'ele' => (float)$trkpt->ele ?? null,
+            ]);
+        }
+
+        return response()->json(['message' => 'GPX file parsed and saved.']);
+  
 
     }
 
 
 }
+
+//     $trackPoints =  $xml->trk->trkseg->trkpt ?? [];
+//     // Save track points
+//    if (is_array($trackPoints) && count($trackPoints) > 0) {
+//     foreach ($trackPoints as $pt) {
+//         TrackPoint::create([
+//             'latitude' => (float) $pt['lat'],
+//             'longitude' => (float) $pt['lon'],
+//         ]);
+//     }
+// } else {
+//     Log::warning('No track points found in the GPX file');
+// }
+//     return response()->json([
+//          'success' => false,
+//         'message' => 'trackPoints: Invalid file or no file uploaded.'
+//     ], 400);

@@ -49,10 +49,14 @@ Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
  * 
  */
 // Legacy GPX endpoints (keep if used by RN)
-    Route::post('/GPX-UPLOADED', [GpxController::class, 'uploadGPX']);
-    Route::get('/GPX-GOT', [GpxController::class, 'extract']);
-    
-    // Waypoints / GPX
+
+//Used for recording the route page
+    Route::post('/ADM_GPX_UPLOAD', [GpxController::class, 'store']); // reuse the store
+    Route::get('/ADM_GPX-DOWNLOAD', [GpxController::class, 'download']);
+    Route::delete('/ADM_GPX_DELETE', [GpxController::class, 'delete']);
+
+// Used for uploading the file to the event page.
+// Waypoints / GPX
     Route::get('/filefetch', [WPReactController::class, 'index']);            // read
     Route::post('/gpx-upload', [WPReactController::class, 'store']);          // RN upload (if used)
     Route::post('/delete', [WPReactController::class, 'delete']);             // consider making this DELETE + admin
@@ -61,7 +65,6 @@ Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
  * Event Register Controller
  * 
  */
-
     //public routes
     Route::get('/events', [EventController::class, 'index']); // list events
 
