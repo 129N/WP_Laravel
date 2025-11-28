@@ -10,7 +10,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\TeamController;
 use App\Models\EventRegistration;
 use App\Http\Controllers\AdminController;
-
+use App\Http\Controllers\ParticipantLocationController;
 
 //http://192.168.0.101:8000/ is used for Waypoint tracker 
 
@@ -105,6 +105,19 @@ Route::middleware('auth:sanctum')->group(function() {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/overview', [AdminController::class, 'getFullOverview']);
 });
+
+/**
+ * User location in an event
+ * 
+ */
+Route::middleware('auth:sanctum') ->group(function() {
+    //live gps
+    Route::post('/events/{event_id}/location', [ParticipantLocationController::class, 'store']);
+
+    //fetch latest GPS for event
+    Route::get('/events/{event_id}/locations', [ParticipantLocationController::class, 'getUserLocation']);
+});
+
 
 
 
