@@ -120,6 +120,31 @@ class EventController extends Controller
     }
 
 
+    public function checkIn(Request $request, $eventId){
+        $user = $request->user(); // auth:sanctum ensures this exists
+
+        // find registration:
+        $registration = EventRegistration::where('event_id', $eventId)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$registration) {
+            return response()->json(['error' => 'User not registered for this event'], 404);
+        }
+
+        // update status
+        $registration->update([
+            'status' => 'active',
+            'check_in_time' => now(),
+        ]);
+
+        return response()->json([
+            'message' => 'Check-in successful',
+            'registration' => $registration
+        ]);
+    }
+
+
     //single user delete of registration
     public function deleteParticipants($id){
 

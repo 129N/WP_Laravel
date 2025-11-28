@@ -35,10 +35,6 @@ Route::post('/logout', [AuthController::class, 'logout']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
 
-//Route::post('/login', [AuthController::class, 'login']);
-
-  //Route::get('/registered_users', [AuthController::class, 'getUsers']);
-
     // Dangerous endpoint: keep admin-only or remove.
 Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
 
@@ -57,7 +53,9 @@ Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
 
 // Used for uploading the file to the event page.
 // Waypoints / GPX
-    Route::get('/filefetch', [WPReactController::class, 'index']);            // read
+    Route::get('/filefetch', [WPReactController::class, 'index']);            // read by ALL USERS
+        Route::get('/events/{event_id}/waypoints', [WPReactController::class, 'getEventWaypoints']); //Waypoints only
+        Route::get('/events/{event_id}/trackpoints', [WPReactController::class, 'getEventTrackpoints']); //Trackpoints only
     Route::post('/gpx-upload', [WPReactController::class, 'store']);          // RN upload (if used)
     Route::post('/delete', [WPReactController::class, 'delete']);             // consider making this DELETE + admin
 
@@ -73,6 +71,9 @@ Route::middleware('auth:sanctum')->group(function (){
     // Route::get('/events', [EventController::class, 'index']); // list events
     Route::post('/events', [EventController::class, 'store']); // create event (admin)
     Route::post('/events/{id}/register', [EventController::class, 'registerParticipant']); // register participant
+    Route::post('/events/{id}/check-in', [EventController::class, 'checkIn']);
+
+
     Route::delete('/registrations/{id}', [EventController::class, 'destroy']);
 });
 
@@ -82,10 +83,6 @@ Route::middleware('auth:sanctum')->group(function (){
  * Multiple registration  
  * 
  */
-
-// Route::post('/event_registrations', [EventController::class, 'event']);
-// Route::get('/event_registrations', [EventController::class, 'index']);
-
 Route::middleware('auth:sanctum')->group(function() {
     //Participant creates a team 
     Route::post('/teams', [TeamController::class, 'createTeam']);
@@ -116,6 +113,11 @@ Route::middleware('auth:sanctum') ->group(function() {
 
     //fetch latest GPS for event
     Route::get('/events/{event_id}/locations', [ParticipantLocationController::class, 'getUserLocation']);
+
+// Notifications in event
+    Route::post('/events/{event_id}/emergency', [NotificationCtrl::class, 'store']); //TODO change the name to contingency 
+        Route::get('/events/{event_id}/emergency', [NotificationCtrl::class, 'index']);  //TODO change the name to contingency 
+
 });
 
 
@@ -127,9 +129,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Current user
     Route::get('/user', fn (Request $request) => $request->user());
 
-    // Notifications
-    Route::post('/notify', [NotificationCtrl::class, 'store']);
-    Route::get('/notifications', [NotificationCtrl::class, 'index']);         // fix class name case
 
     // Admin-only or now is ok 
     Route::middleware(['auth:sanctum','role:admin'])->group(function () {

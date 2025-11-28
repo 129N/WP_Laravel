@@ -12,11 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('notifications', function (Blueprint $table) {
-         $table->id();
-            $table->unsignedBigInteger('participant_id');
-            $table->enum('type', ['help', 'surrender']);
-            $table->string('message');
-            $table->timestamps();
+        $table->id(); //primary key
+            $table->unsignedBigInteger('participant_id'); //foreign key from UserReact
+            $table->unsignedBigInteger('event_id'); //foreign key from UserReact
+        $table->enum('type', ['emergency', 'surrender', 'waypoint', 'offline']);
+        $table->string('message');
+        $table->timestamps();
+
+//Foreign key
+        $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
+        $table->foreign('participant_id')->references('id')->on('user_reacts')->onDelete('cascade');
+ // Indexes for performance
+        $table->index(['event_id', 'created_at']);
         });
     }
 

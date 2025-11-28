@@ -11,7 +11,7 @@ class EventRegistration extends Model
     // echo $registration->user->email; // participant email
 
     use HasFactory;
-
+// \2025_09_28_142455_create_event_registrations_table.php
     protected $fillable = [
         'event_id',
         'user_id',

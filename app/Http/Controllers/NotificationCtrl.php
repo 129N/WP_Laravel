@@ -13,9 +13,9 @@ class NotificationCtrl extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($event_id)
     {
-          $notifications = Notification::latest()->get();
+          $notifications = Notification::where('event_id', $event_id)->orderBy('created_at', 'desc')->get();
         return response()->json($notifications);
     }
 
@@ -25,26 +25,25 @@ class NotificationCtrl extends Controller
     public function create()
     {
         //
-
-          
         Notification::all();
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $event_id)
     {
         $request->validate([
             'participant_id' => 'required|integer',
-            'type' => 'required|in:help,surrender',
+            'type' => 'required|in:emergency,surrender,waypoint,offline',
             'message' => 'required|string',
         ]);
 
         $notification = Notification::create([
-            'participant_id' => $request->participant_id,
-            'type' => $request->type,
-            'message' => $request->message,
+            'event_id' => $event_id,
+        'participant_id' => $request->participant_id,
+        'type' => $request->type,
+        'message' => $request->message,
         ]);
 
         return response()->json(['success' => true, 'data' => $notification], 201);
