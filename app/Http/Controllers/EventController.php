@@ -34,6 +34,24 @@ class EventController extends Controller
         return response()->json($events, 200);
     }
 
+    public function showEvent($event_code)
+{
+    $event = Event::where('event_code', $event_code)
+        ->with(['creator:id,name,email'])
+        ->firstOrFail();
+
+    return response()->json([
+        'id' => $event->id,
+        'event_code' => $event->event_code,
+        'event_title' => $event->event_title,
+        'description' => $event->description,
+        'event_date' => $event->event_date,
+        'creator_name' => $event->creator->name ?? 'Unknown',
+        'creator_email' => $event->creator->email ?? null,
+    ], 200);
+}
+
+
 
     // Creates a new event
         public function store(Request $request)
@@ -74,8 +92,8 @@ class EventController extends Controller
         
     }
 
-    // register a single participant to an event
-        public function registerParticipant(Request $request, $id)
+// POST: register a single participant to an event
+        public function registerParticipant(Request $request, $event_code)
     {
          // Validate input
         $validated = $request->validate([
@@ -84,7 +102,9 @@ class EventController extends Controller
         ]);
 
         // Make sure event exists
-        $event = Event::findOrFail($id);
+        // $event = Event::findOrFail($id);
+        $event = Event::where('event_code', $event_code)->firstOrFail();
+
 
         //Get user ID 
         $user = $request->user();
@@ -118,13 +138,20 @@ class EventController extends Controller
             'registration' => $registration,
         ], 201);
     }
+// GET the registerParticipant
+        public function getParticipant(Request $request, $event_code)
+    {
+        $event = Event::where('event_code', $event_code) -> firstOrFail();
+        $participants = EventRegistration::where('event_id', $event ->id)
+        ->with('user') -> get();
+        return response()->json($participants);
+    }
 
-
-    public function checkIn(Request $request, $eventId){
+    public function checkIn(Request $request, $event_code){
         $user = $request->user(); // auth:sanctum ensures this exists
 
         // find registration:
-        $registration = EventRegistration::where('event_id', $eventId)
+        $registration = EventRegistration::where('event_id', $event_code)
             ->where('user_id', $user->id)
             ->first();
 
