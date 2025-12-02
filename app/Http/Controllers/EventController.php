@@ -139,11 +139,21 @@ class EventController extends Controller
         ], 201);
     }
 // GET the registerParticipant
-        public function getParticipant(Request $request, $event_code)
+        public function getParticipant( $event_code)
     {
         $event = Event::where('event_code', $event_code) -> firstOrFail();
         $participants = EventRegistration::where('event_id', $event ->id)
-        ->with('user') -> get();
+        ->with('user') -> get()->map(function ($reg) {
+            return [
+                'id' => $reg->id,
+                'user_id' => $reg->user_id,
+                'name' => $reg->user->name ?? null, // NEW ADD
+                'email' => $reg->user->email ?? null,// NEW ADD
+                'team' => $reg->group_name,
+                'status' => $reg->status,
+            ];
+        });
+
         return response()->json($participants);
     }
 

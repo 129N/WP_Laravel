@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\WP_react;
 use App\Http\Controllers\Controller;
+use App\Models\Event;
 use Illuminate\Http\Request;
 
 
@@ -24,8 +25,6 @@ class WPReactController extends Controller
     ]);
 
     }
-
- 
 
     /**
      * Store a newly created resource in storage.
@@ -127,4 +126,61 @@ class WPReactController extends Controller
     {
         //
     }
+
+
+    public function storeForEvent(Request $request, $event_code)
+{
+    set_time_limit(300);
+
+    if (!$request->hasFile('gpx_file')) {
+        return response()->json(['error' => 'No GPX file uploaded.'], 400);
+    }
+
+    $event = Event::where('event_code', $event_code)->firstOrFail();
+
+    $file = $request->file('gpx_file');
+    $gpxContent = file_get_contents($file->getRealPath());
+    $gpxContent = str_replace('xmlns=', 'ns=', $gpxContent);
+    $xml = simplexml_load_string($gpxContent);
+
+    if (!$xml) return response()->json(['error' => 'Invalid XML'], 400);
+
+    // Optional: clear old route for this event so you don't double-store
+    WP_react::where('event_id', $event->id)->delete();
+
+    // Now reuse your existing logic:
+    $this->parseAndStoreGpx($xml, $event->id);
+
+    return response()->json(['message' => 'GPX file parsed and saved for event '.$event_code]);
+}
+
+// helper used by both store() and storeForEvent()
+private function parseAndStoreGpx(\SimpleXMLElement $xml, ?int $eventId)
+{
+    foreach ($xml->wpt as $wpt) {
+        WP_react::create([
+            'event_id' => $eventId,
+            'type'     => 'wpt',
+            'lat'      => (float)$wpt['lat'],
+            'lon'      => (float)$wpt['lon'],
+            'name'     => (string)$wpt->name ?? null,
+            'desc'     => (string)$wpt->desc ?? null,
+            'ele'      => null,
+        ]);
+    }
+
+    foreach ($xml->trk->trkseg->trkpt as $trkpt) {
+        WP_react::create([
+            'event_id' => $eventId,
+            'type'     => 'trkpt',
+            'lat'      => (float)$trkpt['lat'],
+            'lon'      => (float)$trkpt['lon'],
+            'name'     => null,
+            'desc'     => null,
+            'ele'      => (float)$trkpt->ele ?? null,
+        ]);
+    }
+}
+
+
 }

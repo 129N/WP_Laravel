@@ -54,9 +54,11 @@ Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
 // Used for uploading the file to the event page.
 // Waypoints / GPX
     Route::get('/filefetch', [WPReactController::class, 'index']);            // read by ALL USERS
-        Route::get('/events/{event_id}/waypoints', [WPReactController::class, 'getEventWaypoints']); //Waypoints only
-        Route::get('/events/{event_id}/trackpoints', [WPReactController::class, 'getEventTrackpoints']); //Trackpoints only
-    Route::post('/gpx-upload', [WPReactController::class, 'store']);          // RN upload (if used)
+        Route::get('/events/{event_code}/waypoints', [WPReactController::class, 'getEventWaypoints']); //Waypoints only
+        Route::get('/events/{event_code}/trackpoints', [WPReactController::class, 'getEventTrackpoints']); //Trackpoints only
+    Route::post('/gpx-upload', [WPReactController::class, 'store']);          // React Web and RN upload (if used)
+        Route::post('/events/{event_code}/gpx-upload', [WPReactController::class, 'storeForEvent']); //For admin, type the Event code 
+
     Route::post('/delete', [WPReactController::class, 'delete']);             // consider making this DELETE + admin
 
 /**
