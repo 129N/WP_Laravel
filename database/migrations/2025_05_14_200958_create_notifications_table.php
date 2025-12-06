@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('event_id'); //foreign key from UserReact
         $table->enum('type', ['emergency', 'surrender', 'waypoint', 'offline']);
         $table->string('message');
+        $table->string('event_code')->nullable(); //newly added
         $table->timestamps();
 
 //Foreign key

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Notification;
 use App\Http\Controllers\Controller;
+use App\Models\Event;
 use Illuminate\Http\Request;
 
 
@@ -13,9 +14,13 @@ class NotificationCtrl extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index($event_id)
+    public function index($event_code)
     {
-          $notifications = Notification::where('event_id', $event_id)->orderBy('created_at', 'desc')->get();
+// validate event    
+        $event = Event::where('event_code', $event_code)->firstOrFail();
+// Fetch notification linked by event_id
+        $notifications = Notification::where('event_id', $event->id)
+        ->orderBy('created_at', 'desc')->get();
         return response()->json($notifications);
     }
 
@@ -31,16 +36,19 @@ class NotificationCtrl extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, $event_id)
+    public function store(Request $request, $event_code)
     {
         $request->validate([
             'participant_id' => 'required|integer',
             'type' => 'required|in:emergency,surrender,waypoint,offline',
             'message' => 'required|string',
         ]);
+          // Convert event_code into event_id
+    $event = Event::where('event_code', $event_code)->firstOrFail();
 
         $notification = Notification::create([
-            'event_id' => $event_id,
+        'event_id' => $event->id,
+        'event_code' => $event_code,
         'participant_id' => $request->participant_id,
         'type' => $request->type,
         'message' => $request->message,

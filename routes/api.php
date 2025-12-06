@@ -60,6 +60,8 @@ Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
         Route::post('/events/{event_code}/gpx-upload', [WPReactController::class, 'storeForEvent']); //For admin, type the Event code 
 
     Route::post('/delete', [WPReactController::class, 'delete']);             // consider making this DELETE + admin
+    //safety delete    
+    Route::delete('/events/{event_code}/gpx', [WPReactController::class, 'deleteEventGpx']);
 
 /**
  * Event Register Controller
@@ -117,15 +119,14 @@ Route::middleware('auth:sanctum')->group(function () {
  */
 Route::middleware('auth:sanctum') ->group(function() {
     //live gps
-    Route::post('/events/{event_id}/location', [ParticipantLocationController::class, 'store']);
+    Route::post('/events/{event_code}/location', [ParticipantLocationController::class, 'store']);
 
     //fetch latest GPS for event
-    Route::get('/events/{event_id}/locations', [ParticipantLocationController::class, 'getUserLocation']);
+    Route::get('/events/{event_code}/locations', [ParticipantLocationController::class, 'getUserLocation']);
 
 // Notifications in event
-    Route::post('/events/{event_id}/emergency', [NotificationCtrl::class, 'store']); //TODO change the name to contingency 
-        Route::get('/events/{event_id}/emergency', [NotificationCtrl::class, 'index']);  //TODO change the name to contingency 
-
+    Route::post('/events/{event_code}/notifications', [NotificationCtrl::class, 'store']); 
+        Route::get('/events/{event_code}/notifications', [NotificationCtrl::class, 'index']); 
 });
 
 

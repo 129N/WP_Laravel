@@ -85,12 +85,16 @@ class WPReactController extends Controller
     /**
      * Display the waypoints int the Admin MapView,
      */
-    public function getEventWaypoints($eventId)
+    public function getEventWaypoints($event_code)
     {
         // WAYPOINT 
          set_time_limit(300);
-         $waypoints = WP_react::where('event_id', $eventId)->where('type', 'wpt')->get();
-        
+        $event = Event::where('event_code', $event_code) -> firstOrFail();
+
+        $waypoints = WP_react::select('id', 'lat', 'lon', 'name')
+        ->where('type', 'wpt')
+        ->get();
+    
          return response()->json(['waypoints' => $waypoints,]);
     }
 
@@ -98,11 +102,17 @@ class WPReactController extends Controller
     /**
      * Display the trackpoints int the Admin MapView,
      */
-    public function getEventTrackpoints($eventId)
+    public function getEventTrackpoints($event_code)
     {
         // TRACKPOINT
         set_time_limit(300);
-        $trackpoints = WP_react::where('event_id', $eventId)->where ('type', 'trkpt')->orderBy('id')->get();
+        $event = Event::where('event_code', $event_code) -> firstOrFail();
+
+        $trackpoints = WP_react::select('id', 'lat', 'lon', 'ele')
+        ->where('event_id', $event->id)
+        ->where('type', 'trkpt')
+        ->orderBy('id')
+        ->get();
 
         return response()->json([ 'trackpoints' => $trackpoints ]);
     }
@@ -122,10 +132,19 @@ class WPReactController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(WP_react $wP_react)
-    {
-        //
-    }
+public function deleteEventGpx($event_code)
+{
+    // 1. Validate event
+    $event = Event::where('event_code', $event_code)->firstOrFail();
+
+    // 2. Delete only this event's gpx
+    WP_react::where('event_id', $event->id)->delete();
+
+    return response()->json([
+        'message' => "GPX removed for event {$event_code}"
+    ]);
+}
+
 
 
     public function storeForEvent(Request $request, $event_code)
