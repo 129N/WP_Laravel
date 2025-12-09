@@ -120,15 +120,13 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum') ->group(function() {
     //live gps
     Route::post('/events/{event_code}/location', [ParticipantLocationController::class, 'store']);
-
-    //fetch latest GPS for event
-    Route::get('/events/{event_code}/locations', [ParticipantLocationController::class, 'getUserLocation']);
-
 // Notifications in event
     Route::post('/events/{event_code}/notifications', [NotificationCtrl::class, 'store']); 
-        Route::get('/events/{event_code}/notifications', [NotificationCtrl::class, 'index']); 
 });
 
+ //fetch latest GPS for event
+    Route::get('/events/{event_code}/locations', [ParticipantLocationController::class, 'getUserLocation']);
+    Route::get('/events/{event_code}/notifications', [NotificationCtrl::class, 'index']); 
 
 
 

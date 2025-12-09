@@ -21,6 +21,6 @@ class Notification extends Model
     }
 
     public function participant(){
-      return $this -> belongsTo(User_react::class);
+      return $this -> belongsTo(User_react::class, 'participant_id', 'id');
     }
 }

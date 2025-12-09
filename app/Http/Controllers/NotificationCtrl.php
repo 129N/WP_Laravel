@@ -19,7 +19,8 @@ class NotificationCtrl extends Controller
 // validate event    
         $event = Event::where('event_code', $event_code)->firstOrFail();
 // Fetch notification linked by event_id
-        $notifications = Notification::where('event_id', $event->id)
+        $notifications = Notification::with('participant:id,name,email')
+        ->where('event_id', $event->id)
         ->orderBy('created_at', 'desc')->get();
         return response()->json($notifications);
     }
