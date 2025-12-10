@@ -113,6 +113,9 @@ class EventController extends Controller
         if(!$userId){
             return response()->json(['error' => 'User not authenticated or user_id missing'], 401);
         }
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
 
 
         //Check for duplicate registration 

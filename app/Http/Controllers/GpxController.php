@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\GpxFile;
 use Illuminate\Http\Request;
 use App\Models\Waypoint;
-use App\Models\TrackPoint;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use App\Models\WP_react;
+
+
 //       Log::info('Gpx Processor hit');
 class GpxController extends Controller
 {
@@ -72,23 +74,76 @@ class GpxController extends Controller
 
     }
 
-    public function download()
+    public function download($fileId)
     {
-            set_time_limit(300);
-            $waypoints = WP_react::where('type', 'wpt')->get();
-            $trackpoints = WP_react::where ('type', 'trkpt')->get();
-            return response()->json([
-            'waypoints' => $waypoints,
-            'trackpoints' => $trackpoints,
-        ]);
+        $gpxFile = GpxFile::findOrFail($fileId);
+
+        $fullPath = storage_path("app/private/{$gpxFile->file_path}");
+
+            if (!file_exists($fullPath)) {
+                return response()->json(['error' => 'File not found'], 404);
+            }
+
+            return response()->download(
+                $fullPath,
+                ($gpxFile->route_name ?? 'route') . '.gpx',
+                ['Content-Type' => 'application/gpx+xml']
+            );
 
     }
 
-    public function delete()
+    private function buildGpxFromPoints($gpxFile, $points)
+{
+    $wpts = "";
+    $trkpts = "";
+
+    foreach ($points as $p) {
+        if ($p->type === 'wpt') {
+            $wpts .= "<wpt lat=\"{$p->lat}\" lon=\"{$p->lon}\">\n";
+            if ($p->name) $wpts .= "<name>{$p->name}</name>\n";
+            $wpts .= "</wpt>\n";
+        } else {
+            $trkpts .= "<trkpt lat=\"{$p->lat}\" lon=\"{$p->lon}\">\n";
+            $trkpts .= "<time>" . now()->toIso8601String() . "</time>\n";
+            $trkpts .= "</trkpt>\n";
+        }
+    }
+
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+    <gpx version=\"1.1\" creator=\"WaypointTracker\" xmlns=\"http://www.topografix.com/GPX/1/1\">
+        {$wpts}
+        <trk>
+            <name>{$gpxFile->route_name}</name>
+            <trkseg>
+                {$trkpts}
+            </trkseg>
+        </trk>
+    </gpx>";
+}
+
+
+
+    public function list()
     {
-        //
-        WP_react::truncate();
-        return response()->json(['message' => 'The gpx file delete OK']);
+        return response()->json(GpxFile::orderBy('id', 'desc')->get());
+    }
+
+    public function delete($fileId)
+    {
+       $gpxFile = GpxFile::find($fileId);
+
+        if (!$gpxFile) {
+            return response()->json(['error' => 'file_id not found'], 404);
+        }
+
+// Delete all points associated with this GPX file
+        WP_react::where('gpx_file_id', $fileId)->delete();
+
+// Delete the GPX file metadata
+        $gpxFile->delete();
+
+        return response()->json(['message' => 'GPX file deleted', 'file_id' => $fileId]);
+
     }
 
     public function store(Request $request)
@@ -99,17 +154,48 @@ class GpxController extends Controller
             return response()->json(['error' => 'No GPX file uploaded.'], 400);
         }
 
-          $file = $request->file('gpx_file');
+        $file = $request->file('gpx_file');
         $gpxContent = file_get_contents($file->getRealPath());
-
         $gpxContent = str_replace('xmlns=', 'ns=', $gpxContent);
-        $xml = simplexml_load_string($gpxContent);
 
+        $xml = simplexml_load_string($gpxContent);
          if (!$xml) return response()->json(['error' => 'Invalid XML'], 400);
 
-          // Parse Waypoints
+        $fileId = $request->input('file_id');       // null for new
+        $routeName = $request->input('route_name') ?? ('Recorded Route ' . time());
+ /* =============================
+       UPDATE EXISTING GPX FILE
+    ============================== */
+    if ($fileId) {
+        $gpxFile = GpxFile::find($fileId);
+
+        if (!$gpxFile) {
+            return response()->json(['error' => 'Invalid file_id'], 400);
+        }
+
+        // Remove old points
+        WP_react::where('gpx_file_id', $fileId)->delete();
+
+        // Update name
+        $gpxFile->route_name = $routeName;
+        $gpxFile->save();
+
+    } else {
+
+        /* =============================
+           CREATE NEW GPX FILE
+        ============================== */
+        $gpxFile = GpxFile::create([
+            'route_name'  => $routeName,
+            'uploaded_by' => $request->user()->id ?? null,
+        ]);
+    }
+
+
+// Parse Waypoints
         foreach ($xml->wpt as $wpt) {
             WP_react::create([
+                 'gpx_file_id' => $gpxFile->id, // NEW ID for uploading
                 'type' => 'wpt',
                 'lat' => (float)$wpt['lat'],
                 'lon' => (float)$wpt['lon'],
@@ -119,9 +205,10 @@ class GpxController extends Controller
             ]);
         }
 
-          // Parse Trackpoints
+// Parse Trackpoints
           foreach ($xml->trk->trkseg->trkpt as $trkpt) {
             WP_react::create([
+                 'gpx_file_id' => $gpxFile->id, // NEW ID for uploading
                 'type' => 'trkpt',
                 'lat' => (float)$trkpt['lat'],
                 'lon' => (float)$trkpt['lon'],
@@ -130,12 +217,12 @@ class GpxController extends Controller
                 'ele' => (float)$trkpt->ele ?? null,
             ]);
         }
-
-        return response()->json(['message' => 'GPX file parsed and saved.']);
-  
-
+    return response()->json([
+        'message' => 'GPX saved',
+        'file_id' => $gpxFile->id,
+        'route_name' => $gpxFile->route_name
+    ]);
     }
-
 
 }
 

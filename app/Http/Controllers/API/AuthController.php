@@ -46,7 +46,7 @@ class AuthController extends Controller
        try{ 
           set_time_limit(300);
         $request -> validate([
-            'email' => 'required|string|email|unique:users,email',
+            'email' => 'required|string|email|unique:user_reacts,email', // 'unique:users,email'
             'password' => 'required|string',
             'role' => 'required|in:admin,competitor',
             'name' => 'required|string',
@@ -80,7 +80,7 @@ class AuthController extends Controller
 
     public function login_react(Request $request){
         Log::info('Login request data:', $request->all());
-
+        
            // Validate incoming request
             $validator = Validator::make($request->all(), [
                 'email' => 'required|string|email',
@@ -93,6 +93,10 @@ class AuthController extends Controller
 
             // Find user by email
             $user = User_react::where('email', $request->email)->first();
+                            Log::info('User found?', [$user]);
+        Log::info('Password match?', [
+        Hash::check($request->password, $user->password ?? 'NULL')
+        ]);
 
             // Check if user exists and if the password matches
             if (!$user || !Hash::check($request->password, $user->password)) {

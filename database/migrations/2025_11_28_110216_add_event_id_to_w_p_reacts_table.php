@@ -12,11 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('w_p_reacts', function (Blueprint $table) {
-            //Foreign key
-            $table->unsignedBigInteger('event_id')->nullable()->after('id');
-
-            //Optional
-            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
+            $table->unsignedBigInteger('gpx_file_id')->nullable()->after('id');
+            $table->foreign('gpx_file_id')->references('id')->on('gpx_files')
+            ->onDelete('cascade');
         });
     }
 
@@ -27,8 +25,8 @@ return new class extends Migration
     {
         Schema::table('w_p_reacts', function (Blueprint $table) {
             //
-            $table->dropForeign(['event_id']);
-            $table->dropColumn('event_id');
+            $table->dropForeign(['gpx_file_id']);
+            $table->dropColumn('gpx_file_id');
         });
     }
 };

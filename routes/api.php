@@ -48,9 +48,12 @@ Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
 
 //Used for recording the route page
     Route::post('/ADM_GPX_UPLOAD', [GpxController::class, 'store']); // reuse the store
-    Route::get('/ADM_GPX-DOWNLOAD', [GpxController::class, 'download']);
-    Route::delete('/ADM_GPX_DELETE', [GpxController::class, 'delete']);
+    Route::get('/ADM_GPX_DOWNLOAD{file_id}', [GpxController::class, 'download']);
+    Route::delete('/ADM_GPX_DELETE/{file_id}', [GpxController::class, 'delete']);
 
+Route::get('/ADM_GPX_LIST', [GpxController::class, 'list']);
+
+    
 // Used for uploading the file to the event page.
 // Waypoints / GPX
     Route::get('/filefetch', [WPReactController::class, 'index']);            // read by ALL USERS
@@ -73,7 +76,7 @@ Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
 
     Route::get('/events/{event_code}', [EventController::class, 'showEvent']);
 
-    Route::post('/events/{event_code}/register', [EventController::class, 'registerParticipant']); // register participant
+   
         Route::get('/events/{event_code}/participants', [EventController::class, 'getParticipant']);
     
 
@@ -85,6 +88,9 @@ Route::middleware('auth:sanctum')->group(function (){
     Route::post('/events/{event_code}/check-in', [EventController::class, 'checkIn']);
 
     Route::delete('/registrations/{event_code}', [EventController::class, 'destroy']);
+
+    
+     Route::post('/events/{event_code}/register', [EventController::class, 'registerParticipant']); // register participant
 });
 
 
