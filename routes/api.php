@@ -48,7 +48,7 @@ Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
 
 //Used for recording the route page
     Route::post('/ADM_GPX_UPLOAD', [GpxController::class, 'store']); // reuse the store
-    Route::get('/ADM_GPX_DOWNLOAD{file_id}', [GpxController::class, 'download']);
+    Route::get('/ADM_GPX_DOWNLOAD/{file_id}', [GpxController::class, 'download']);
     Route::delete('/ADM_GPX_DELETE/{file_id}', [GpxController::class, 'delete']);
 
 Route::get('/ADM_GPX_LIST', [GpxController::class, 'list']);

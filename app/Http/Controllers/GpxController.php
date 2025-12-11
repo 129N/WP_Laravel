@@ -122,10 +122,29 @@ class GpxController extends Controller
 }
 
 
-
     public function list()
     {
-        return response()->json(GpxFile::orderBy('id', 'desc')->get());
+        //return response()->json(GpxFile::orderBy('id', 'desc')->get());
+
+        try{
+
+            $files = GpxFile::orderBy('id', 'desc')
+            ->get()->map(function ($file){
+                return[
+                    'id' => $file->id, 
+                    'route_name' => $file->route_name,
+                    'uploaded_by' => $file->uploaded_by, 
+                    'event_id' => $file->event_id, 
+                    'file_path' => $file->file_path, 
+                    'created_at' => $file->created_at ? $file->created_at->toDateTimeString() : null,
+                ];
+
+                return response() -> json($files, 200);
+            });
+        }
+        catch(\Exception $e){
+            return response()->json([ 'error' => 'Failed to load GPX files', 'details' => $e->getMessage(), ], 500);
+        }
     }
 
     public function delete($fileId)
