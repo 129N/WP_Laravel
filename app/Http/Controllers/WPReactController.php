@@ -92,6 +92,7 @@ class WPReactController extends Controller
         $event = Event::where('event_code', $event_code) -> firstOrFail();
 
         $waypoints = WP_react::select('id', 'lat', 'lon', 'name')
+        ->where('event_id', $event -> id)
         ->where('type', 'wpt')
         ->get();
     
