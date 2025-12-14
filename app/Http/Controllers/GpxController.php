@@ -164,7 +164,17 @@ class GpxController extends Controller
 
     }
 
-    public function store(Request $request)
+       public function store(Request $request)
+    {
+        return $this->handleRawGpxUpload($request);
+    }
+
+    public function StoreMobile(Request $request)
+    {
+        return $this->handleRawGpxUpload($request);
+    }
+
+    public function handleRawGpxUpload(Request $request)
     {
         set_time_limit(300);
 
@@ -246,21 +256,7 @@ class GpxController extends Controller
     ]);
     }
 
+
+        
 }
 
-//     $trackPoints =  $xml->trk->trkseg->trkpt ?? [];
-//     // Save track points
-//    if (is_array($trackPoints) && count($trackPoints) > 0) {
-//     foreach ($trackPoints as $pt) {
-//         TrackPoint::create([
-//             'latitude' => (float) $pt['lat'],
-//             'longitude' => (float) $pt['lon'],
-//         ]);
-//     }
-// } else {
-//     Log::warning('No track points found in the GPX file');
-// }
-//     return response()->json([
-//          'success' => false,
-//         'message' => 'trackPoints: Invalid file or no file uploaded.'
-//     ], 400);

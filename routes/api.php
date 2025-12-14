@@ -50,7 +50,8 @@ Route::delete('/registered_users', [AuthController::class, 'deleteUsers']);
     Route::post('/ADM_GPX_UPLOAD', [GpxController::class, 'store']); // reuse the store
     Route::get('/ADM_GPX_DOWNLOAD/{file_id}', [GpxController::class, 'download']);
     Route::delete('/ADM_GPX_DELETE/{file_id}', [GpxController::class, 'delete']);
-
+//Route::post('/gpx-upload', [WPReactController::class, 'store']);  
+Route::post('/gpx-upload', [GpxController::class, 'StoreMobile']);  
 Route::get('/ADM_GPX_LIST', [GpxController::class, 'list']);
 
     
@@ -59,7 +60,7 @@ Route::get('/ADM_GPX_LIST', [GpxController::class, 'list']);
     Route::get('/filefetch', [WPReactController::class, 'index']);            // read by ALL USERS
         Route::get('/events/{event_code}/waypoints', [WPReactController::class, 'getEventWaypoints']); //Waypoints only
         Route::get('/events/{event_code}/trackpoints', [WPReactController::class, 'getEventTrackpoints']); //Trackpoints only
-    Route::post('/gpx-upload', [WPReactController::class, 'store']);          // React Web and RN upload (if used)
+            // React Web and RN upload (if used)
         Route::post('/events/{event_code}/gpx-upload', [WPReactController::class, 'storeForEvent']); //For admin, type the Event code 
 
     Route::post('/delete', [WPReactController::class, 'delete']);             // consider making this DELETE + admin
