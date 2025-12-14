@@ -13,6 +13,8 @@ class GpxFile extends Model
 
     public function points()
     {
-        return $this->hasMany(WP_react::class, 'gpx_file_id');
+        //return $this->hasMany(WP_react::class, 'gpx_file_id');
+        return $this->hasMany(GpxPoint::class, 'gpx_file_id');
     }
+    
 }

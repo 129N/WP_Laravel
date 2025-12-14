@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\GpxFile;
+use App\Models\GpxPoint;
 use Illuminate\Http\Request;
 use App\Models\Waypoint;
 use Illuminate\Support\Facades\Storage;
@@ -154,7 +155,7 @@ class GpxController extends Controller
         }
 
 // Delete all points associated with this GPX file
-        WP_react::where('gpx_file_id', $fileId)->delete();
+        GpxPoint::where('gpx_file_id', $fileId)->delete();
 
 // Delete the GPX file metadata
         $gpxFile->delete();
@@ -191,7 +192,7 @@ class GpxController extends Controller
         }
 
         // Remove old points
-        WP_react::where('gpx_file_id', $fileId)->delete();
+        GpxPoint::where('gpx_file_id', $fileId)->delete();
 
         // Update name
         $gpxFile->route_name = $routeName;
@@ -211,27 +212,31 @@ class GpxController extends Controller
 
 // Parse Waypoints
         foreach ($xml->wpt as $wpt) {
-            WP_react::create([
-                 'gpx_file_id' => $gpxFile->id, // NEW ID for uploading
+            GpxPoint::create([
+                'gpx_file_id' => $gpxFile->id, // NEW ID for uploading
                 'type' => 'wpt',
                 'lat' => (float)$wpt['lat'],
                 'lon' => (float)$wpt['lon'],
                 'name' => (string)$wpt->name ?? null,
                 'desc' => (string)$wpt->desc ?? null,
                 'ele' => null,
+
+                'event_id' => null,               // ✅ IMPORTANT
             ]);
         }
 
 // Parse Trackpoints
           foreach ($xml->trk->trkseg->trkpt as $trkpt) {
-            WP_react::create([
-                 'gpx_file_id' => $gpxFile->id, // NEW ID for uploading
+            GpxPoint::create([
+                'gpx_file_id' => $gpxFile->id, // NEW ID for uploading
                 'type' => 'trkpt',
                 'lat' => (float)$trkpt['lat'],
                 'lon' => (float)$trkpt['lon'],
                 'name' => null,
                 'desc' => null,
                 'ele' => (float)$trkpt->ele ?? null,
+
+                'event_id' => null,               // ✅ IMPORTANT
             ]);
         }
     return response()->json([
