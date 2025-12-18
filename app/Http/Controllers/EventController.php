@@ -51,8 +51,6 @@ class EventController extends Controller
     ], 200);
 }
 
-
-
     // Creates a new event
         public function store(Request $request)
     {

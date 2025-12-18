@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\EmergencyMessageSent;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\AuthController;
@@ -10,7 +11,9 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\TeamController;
 use App\Models\EventRegistration;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EmergencyChatController;
 use App\Http\Controllers\ParticipantLocationController;
+use Illuminate\Support\Facades\Broadcast;
 
 //http://192.168.0.101:8000/ is used for Waypoint tracker 
 
@@ -157,11 +160,30 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::get('/participants', [ParticipantController::class, 'index']);
 });
 
-
-
-
 // Everything else requires Sanctum
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    // 1. Create emergency room
+    Route::post('/event/{event_code}/emergency/{participant_id}/create',
+        [EmergencyChatController::class, 'openRoom']
+    );
+
+    // 2. Send message inside room
+    Route::post('/event/{event_code}/emergency/{participant_id}/message',
+        [EmergencyChatController::class, 'send']
+    );
+});
+
+
+Route::middleware('auth:sanctum')->post('/broadcasting/auth', function (Illuminate\Http\Request $request) {
+    return Broadcast::auth($request);
+});
+
+
+
+
 

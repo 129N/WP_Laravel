@@ -22,7 +22,7 @@ class ParticipantLocationController extends Controller
 
         $event = Event::where('event_code', $event_code) -> firstOrFail();
 
-        ParticipantLocation::created([
+        ParticipantLocation::create([
             'event_id' => $event->id,
             'user_id' => $request->user_id,
             'lat' => $request->lat,
@@ -36,18 +36,36 @@ class ParticipantLocationController extends Controller
     }
 
 
-    public function getUserLocation($event_code){ //why event id?
+public function getUserLocation($event_code)
+{
+    $event = Event::where('event_code', $event_code)->firstOrFail();
 
-        $event = Event::where('event_code', $event_code) -> firstOrFail();
+    // Get latest location per user for this event
+    $latest = ParticipantLocation::where('event_id', $event->id)
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->groupBy('user_id')
+        ->map(fn ($rows) => $rows->first())
+        ->values();
 
-         $latest = ParticipantLocation::select('participant_locations.*')
-            ->where('event_id', $event)
-            ->latest('created_at')
-            ->get()
-            ->groupBy('user_id')
-            ->map(fn($rows) => $rows->first())
-            ->values();
+    return response()->json($latest);
+}
 
-        return response()->json($latest);
-    }   
+// public function getUserLocation($event_code)
+// {
+//     $event = Event::where('event_code', $event_code)->firstOrFail();
+
+//     $latest = ParticipantLocation::whereIn('id', function ($query) use ($event) {
+//         $query->selectRaw('MAX(id)')
+//               ->from('participant_locations')
+//               ->where('event_id', $event->id)
+//               ->groupBy('user_id');
+//     })
+//     ->get(['user_id', 'lat', 'lon', 'speed', 'heading', 'created_at']);
+
+//     return response()->json($latest);
+// }
+
+
+  
 }
